@@ -234,8 +234,7 @@ flattenAgain = flatMap id
 seqOptional ::
   List (Optional a)
   -> Optional (List a)
-seqOptional =
-  error "todo: Course.List#seqOptional"
+seqOptional = foldRight (A.liftA2 (:.)) (Full Nil)
 
 -- | Find the first element in the list matching the predicate.
 --
@@ -257,8 +256,7 @@ find ::
   (a -> Bool)
   -> List a
   -> Optional a
-find =
-  error "todo: Course.List#find"
+find f = foldRight (\a -> (<+>) $ bool Empty (Full a) (f a)) Empty
 
 -- | Determine if the length of the given list is greater than 4.
 --
@@ -276,8 +274,9 @@ find =
 lengthGT4 ::
   List a
   -> Bool
-lengthGT4 =
-  error "todo: Course.List#lengthGT4"
+lengthGT4 = lengthGT 4
+  where lengthGT _ Nil = False
+        lengthGT n (_ :. xs) = n <= 0 || lengthGT (n-1) xs
 
 -- | Reverse a list.
 --
@@ -293,8 +292,7 @@ lengthGT4 =
 reverse ::
   List a
   -> List a
-reverse =
-  error "todo: Course.List#reverse"
+reverse = foldLeft (flip (:.)) Nil
 
 -- | Produce an infinite `List` that seeds with the given value at its head,
 -- then runs the given function for subsequent elements
@@ -322,8 +320,7 @@ produce f x = x :. produce f (f x)
 notReverse ::
   List a
   -> List a
-notReverse =
-  error "todo: Is it even possible?"
+notReverse = id
 
 ---- End of list exercises
 
