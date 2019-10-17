@@ -366,13 +366,15 @@ replicateA n = sequence . replicate n
 -- >>> filtering (const $ True :. True :.  Nil) (1 :. 2 :. 3 :. Nil)
 -- [[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3]]
 --
+-- (NOTE: 8 = 2^3, i.e. [[1],[1]] x [[2],[2]] x [[3],[3]]
+--
 filtering ::
   Applicative k =>
   (a -> k Bool)
   -> List a
   -> k (List a)
 filtering f = foldRight merge (pure Nil)
-  where merge a kas = (lift3 bool) kas ((:.) <$> pure a <*> kas) (f a)
+  where merge a kas = (\b -> bool id (a:.) b) <$> (f a) <*> kas
 
 -----------------------
 -- SUPPORT LIBRARIES --
