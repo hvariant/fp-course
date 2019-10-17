@@ -12,6 +12,8 @@ import Course.List
 import Course.Optional
 import qualified Prelude as P(fmap, return, (>>=))
 
+import qualified Data.Bool (bool)
+
 -- | All instances of the `Applicative` type-class must satisfy four laws.
 -- These laws are not checked by the compiler. These laws are given as:
 --
@@ -341,8 +343,8 @@ replicateA ::
   Int
   -> k a
   -> k (List a)
-replicateA =
-  error "todo: Course.Applicative#replicateA"
+replicateA n = sequence . replicate n
+-- NOTE: this is NOT the same as `replicateA n = lift1 (replicate n)`
 
 -- | Filter a list with a predicate that produces an effect.
 --
@@ -369,8 +371,8 @@ filtering ::
   (a -> k Bool)
   -> List a
   -> k (List a)
-filtering =
-  error "todo: Course.Applicative#filtering"
+filtering f = foldRight merge (pure Nil)
+  where merge a kas = (lift3 bool) kas ((:.) <$> pure a <*> kas) (f a)
 
 -----------------------
 -- SUPPORT LIBRARIES --
