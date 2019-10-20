@@ -29,7 +29,7 @@ instance (Applicative f, Applicative g) =>
   pure = Compose . pure . pure
 -- Implement the (<*>) function for an Applicative instance for Compose
   (<*>) :: Compose f g (a -> b) -> Compose f g a -> Compose f g b
-  (<*>) (Compose f) (Compose a) = Compose $ (<*>) <$> f <*> a
+  (<*>) (Compose f) (Compose a) = Compose $ lift2 (<*>) f a
 
 -- doable, we can just add Comonad f :)
 -- traversable is also an option (https://stackoverflow.com/a/28215697)
