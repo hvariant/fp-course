@@ -605,8 +605,12 @@ phoneParser = (++) <$> (digit .:. phoneBodyParser) <*> (is '#' *> pure Nil)
 -- Result >< Person 123 "Fred" "Clarkson" True "123-456.789"
 personParser ::
   Parser Person
-personParser =
-  error "todo: Course.Parser#personParser"
+personParser = Person
+           <$> ageParser
+          <*>~ firstNameParser
+          <*>~ surnameParser
+          <*>~ smokerParser
+          <*>~ phoneParser
 
 -- Make sure all the tests pass!
 
