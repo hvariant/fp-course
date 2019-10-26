@@ -95,7 +95,7 @@ printFiles ::
   List (FilePath, Chars)
   -> IO ()
 printFiles =
-  void . sequence . map (uncurry printFile)
+  void . mapA (uncurry printFile)
 
 -- Given a file name, return (file name and file contents).
 -- Use @readFile@.
@@ -109,7 +109,7 @@ getFile path = readFile path >>= \content -> pure (path, content)
 getFiles ::
   List FilePath
   -> IO (List (FilePath, Chars))
-getFiles = sequence . map getFile
+getFiles = mapA getFile
 
 -- Given a file name, read it and for each line in that file, read and print contents of each.
 -- Use @getFiles@, @lines@, and @printFiles@.
@@ -121,7 +121,7 @@ run path = (lines <$> readFile path) >>= getFiles >>= printFiles
 -- /Tip:/ use @getArgs@ and @run@
 main ::
   IO ()
-main = getArgs >>= void . sequence . map run
+main = getArgs >>= void . mapA run
 
 ----
 

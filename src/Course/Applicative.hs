@@ -320,6 +320,11 @@ sequence ::
 sequence Nil = pure Nil
 sequence (ka :. kas) = (:.) <$> ka <*> sequence kas
 
+mapA ::
+  Applicative k =>
+  (a -> k b) -> List a -> k (List b)
+mapA f = sequence . map f
+
 -- | Replicate an effect a given number of times.
 --
 -- /Tip:/ Use `Course.List#replicate`.
