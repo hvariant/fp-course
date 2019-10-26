@@ -672,7 +672,7 @@ instance Applicative ListZipper where
 -- ><
 instance Applicative MaybeListZipper where
   pure a = isZ $ pure a
-  (<*>) (MLZ zf) (MLZ za) = MLZ $ (lift2 (<*>)) zf za
+  (<*>) (MLZ zf) (MLZ za) = MLZ $ lift2 (<*>) zf za
 
 -- | Implement the `Extend` instance for `ListZipper`.
 -- This implementation "visits" every possible zipper value derivable from a given zipper (i.e. all zippers to the left and right).
