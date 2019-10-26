@@ -97,6 +97,11 @@ instance Functor ((->) t) where
   -> k a
 (<$) = (<$>) . const
 
+($>) ::
+  Functor k =>
+  k a -> b -> k b
+($>) = flip (<$)
+
 -- | Anonymous map producing unit value.
 --
 -- >>> void (1 :. 2 :. 3 :. Nil)
