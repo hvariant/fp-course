@@ -19,7 +19,7 @@ fastAnagrams ::
   Chars
   -> FilePath
   -> IO (List Chars)
-fastAnagrams s path = map ncString . filter (flip S.member perms) <$> words'
+fastAnagrams s path = map ncString . filter (`S.member` perms) <$> words'
   where words' = map NoCaseString . lines <$> readFile path
         perms :: S.Set NoCaseString
         perms = S.fromList . hlist . map NoCaseString $ permutations s
