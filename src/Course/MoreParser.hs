@@ -55,7 +55,7 @@ spaces = list (satisfy isSpace)
 tok ::
   Parser a
   -> Parser a
-tok t = t <* void spaces
+tok t = t <* spaces
 
 -- | Write a function that parses the given char followed by 0 or more spaces.
 --
