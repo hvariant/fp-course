@@ -101,7 +101,7 @@ instance (Traversable f, Traversable g) =>
     (a -> k b)
     -> Product f g a
     -> k (Product f g b)
-  traverse m (Product fa ga) = Product <$> (sequenceA $ m <$> fa) <*> (sequenceA $ m <$> ga)
+  traverse m (Product fa ga) = Product <$> sequenceA (m <$> fa) <*> sequenceA (m <$> ga)
 
 -- | The `Coproduct` data type contains one value from either of the two type constructors.
 data Coproduct f g a =
