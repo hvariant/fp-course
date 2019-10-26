@@ -187,7 +187,7 @@ data Digit =
   | Seven
   | Eight
   | Nine
-  deriving (Eq, Ord)
+  deriving (Eq, Ord, Show)
 
 showDigit ::
   Digit
@@ -218,7 +218,7 @@ data Digit3 =
   D1 Digit
   | D2 Digit Digit
   | D3 Digit Digit Digit
-  deriving Eq
+  deriving (Eq, Show)
 
 -- Possibly convert a character to a digit.
 fromChar ::
@@ -320,8 +320,83 @@ fromChar _ =
 --
 -- >>> dollars "456789123456789012345678901234567890123456789012345678901234567890.12"
 -- "four hundred and fifty-six vigintillion seven hundred and eighty-nine novemdecillion one hundred and twenty-three octodecillion four hundred and fifty-six septendecillion seven hundred and eighty-nine sexdecillion twelve quindecillion three hundred and forty-five quattuordecillion six hundred and seventy-eight tredecillion nine hundred and one duodecillion two hundred and thirty-four undecillion five hundred and sixty-seven decillion eight hundred and ninety nonillion one hundred and twenty-three octillion four hundred and fifty-six septillion seven hundred and eighty-nine sextillion twelve quintillion three hundred and forty-five quadrillion six hundred and seventy-eight trillion nine hundred and one billion two hundred and thirty-four million five hundred and sixty-seven thousand eight hundred and ninety dollars and twelve cents"
+
+showTwoDigits :: Digit -> Digit -> Chars
+showTwoDigits Zero x = showDigit x
+showTwoDigits One Zero = "ten"
+showTwoDigits One One = "eleven"
+showTwoDigits One Two = "twelve"
+showTwoDigits One Three = "thirteen"
+showTwoDigits One Four = "fourteen"
+showTwoDigits One Five = "fifteen"
+showTwoDigits One Six = "sixteen"
+showTwoDigits One Seven = "seventeen"
+showTwoDigits One Eight = "eighteen"
+showTwoDigits One Nine = "nineteen"
+showTwoDigits x y = combine x y
+  where combine a Zero = tens a
+        combine a b = tens a ++ "-" ++ showDigit b
+        tens One = "ten"
+        tens Two = "twenty"
+        tens Three = "thirty"
+        tens Four = "forty"
+        tens Five = "fifty"
+        tens Six = "sixty"
+        tens Seven = "seventy"
+        tens Eight = "eighty"
+        tens Nine = "ninety"
+        tens Zero = error "impossible"
+
+showDigit3 :: Digit3 -> Chars
+showDigit3 (D1 x) = showDigit x
+showDigit3 (D2 x x2) = showTwoDigits x x2
+showDigit3 (D3 Zero x2 x3) = showTwoDigits x2 x3
+showDigit3 (D3 x1 Zero Zero) = showDigit x1 ++ " hundred"
+showDigit3 (D3 x1 x2 x3) = showDigit x1 ++ " hundred and " ++ showTwoDigits x2 x3
+
+toDigits :: Chars -> List Digit
+toDigits = map full . filter (/= Empty) . map fromChar
+  where full (Full a) = a
+        full Empty = Zero -- doesn't really matter what we pick here
+
+mapBoth :: (a -> b) -> (a, a) -> (b, b)
+mapBoth f (a1, a2) = (f a1, f a2)
+
+toParts :: Chars -> (List Digit, List Digit)
+toParts = mapBoth toDigits . break (== '.')
+
+toGroup3 :: List Digit -> List Digit3
+toGroup3 ds = toGroup3' $ reverse ds
+  where toGroup3' Nil = Nil
+        toGroup3' (x :. Nil) = D1 x :. Nil
+        toGroup3' (x1 :. x2 :. Nil) = D2 x2 x1 :. Nil
+        toGroup3' (x1 :. x2 :. x3 :. xs) = D3 x3 x2 x1 :. toGroup3' xs
+
+showCents :: List Digit -> Chars
+showCents Nil = "zero cents"
+showCents (Zero :. One :. _) = "one cent"
+showCents (x :. Nil) = showTwoDigits x Zero ++ " cents"
+showCents (x :. x2 :. _) = showTwoDigits x x2 ++ " cents"
+
+concatWith :: Chars -> List Chars -> Chars
+concatWith _ Nil = Nil
+concatWith _ (x :. Nil) = x
+concatWith sep (x :. xs) = x ++ sep ++ concatWith sep xs
+
+showWhole :: List Digit3 -> Chars
+showWhole Nil = "zero dollars"
+showWhole (D1 Zero :. Nil) = "zero dollars"
+showWhole (D1 One :. Nil) = "one dollar"
+showWhole d3s = concatWith " " (filter (/= "") $ reverse (zipWith f d3s illion)) ++ " dollars"
+  where f (D3 Zero Zero Zero) _ = ""
+        f (D2 Zero Zero) _ = ""
+        f (D1 Zero) _ = ""
+        f d3 Nil = showDigit3 d3
+        f d3 u = showDigit3 d3 ++ " " ++ u
+
 dollars ::
   Chars
   -> Chars
-dollars =
-  error "todo: Course.Cheque#dollars"
+dollars s = showWhole whole ++ " and " ++ showCents cents
+  where (w, cents) = toParts s
+        whole = toGroup3 w
