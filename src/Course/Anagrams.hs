@@ -40,4 +40,4 @@ equalIgnoringCase ::
   Chars
   -> Chars
   -> Bool
-equalIgnoringCase s1 s2 = (map toUpper s1) == (map toUpper s2)
+equalIgnoringCase s1 s2 = map toUpper s1 == map toUpper s2
