@@ -98,7 +98,7 @@ instance Applicative (State s) where
     State s (a -> b)
     -> State s a
     -> State s b
-  (<*>) kf ka = State $ \s -> let (f, s') = (runState kf s) in first f (runState ka s')
+  (<*>) kf ka = State $ \s -> let (f, s') = runState kf s in first f (runState ka s')
 
 -- | Implement the `Monad` instance for `State s`.
 --
