@@ -66,12 +66,12 @@ instance Applicative List where
   pure ::
     a
     -> List a
-  pure = flip (:.) $ Nil
+  pure = flip (:.) Nil
   (<*>) ::
     List (a -> b)
     -> List a
     -> List b
-  (<*>) fs as = flatten $ map (\f -> map f as) fs
+  (<*>) fs as = flatten $ map (`map` as) fs
 
 -- | Insert into an Optional.
 --
@@ -374,7 +374,7 @@ filtering ::
   -> List a
   -> k (List a)
 filtering f = foldRight merge (pure Nil)
-  where merge a kas = (\b -> bool id (a:.) b) <$> (f a) <*> kas
+  where merge a kas = bool id (a:.) <$> f a <*> kas
 
 -----------------------
 -- SUPPORT LIBRARIES --
