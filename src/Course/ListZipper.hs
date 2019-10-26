@@ -528,7 +528,7 @@ nth ::
   -> ListZipper a
   -> MaybeListZipper a
 nth n lz@(ListZipper l _ _)
-  | n < 0 = undefined
+  | n < 0 = isNotZ
   | otherwise =
       case compare (length l) n of
         EQ -> isZ lz
