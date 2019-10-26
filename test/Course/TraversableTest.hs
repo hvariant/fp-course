@@ -19,7 +19,8 @@ module Course.TraversableTest (
   , courseTest
   ) where
 
-import           Test.Course.Mini (courseTest)
+
+import           Test.Course.Mini   (courseTest)
 import           Test.Mini          (MiniTestTree, testCase, testGroup, (@?=))
 
 import           Course.Compose     (Compose (Compose))
