@@ -84,7 +84,7 @@ onResult (UnexpectedString s)  _ =
 onResult (Result i a) k =
   k i a
 
-data Parser a = P (Input -> ParseResult a)
+newtype Parser a = P (Input -> ParseResult a)
 
 parse ::
   Parser a
@@ -144,7 +144,7 @@ instance Functor Parser where
 valueParser ::
   a
   -> Parser a
-valueParser a = P (\i -> Result i a)
+valueParser a = P (`Result` a)
 
 -- | Return a parser that tries the first parser for a successful value.
 --
@@ -451,7 +451,7 @@ ageParser ::
   Parser Int
 ageParser =
   (\k -> case read k of Empty  -> constantParser (UnexpectedString k)
-                        Full h -> pure h) =<< (list1 digit)
+                        Full h -> pure h) =<< list1 digit
 
 -- | Write a parser for Person.firstName.
 -- /First Name: non-empty string that starts with a capital letter and is followed by zero or more lower-case letters/
@@ -486,7 +486,7 @@ firstNameParser = upper .:. list lower
 -- True
 surnameParser ::
   Parser Chars
-surnameParser = (++) <$> (upper .:. thisMany 5 lower) <*> (list lower)
+surnameParser = (++) <$> (upper .:. thisMany 5 lower) <*> list lower
 
 -- | Write a parser for Person.smoker.
 --
@@ -548,7 +548,7 @@ phoneBodyParser = list (digit ||| is '-' ||| is '.')
 -- True
 phoneParser ::
   Parser Chars
-phoneParser = (++) <$> (digit .:. phoneBodyParser) <*> (is '#' *> pure Nil)
+phoneParser = (++) <$> (digit .:. phoneBodyParser) <*> (is '#' $> Nil)
 
 -- | Write a parser for Person.
 --
