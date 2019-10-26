@@ -51,7 +51,7 @@ instance Extend List where
     -> List a
     -> List b
   (<<=) _ Nil = Nil
-  (<<=) f as@(_ :. as') = (f as) :. (<<=) f as'
+  (<<=) f as@(_ :. as') = f as :. (<<=) f as'
 
 -- | Implement the @Extend@ instance for @Optional@.
 --
