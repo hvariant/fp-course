@@ -199,14 +199,14 @@ distinctF ::
   -> Optional (List a)
 distinctF as = evalT (filtering addDistinct as) S.empty
   where addDistinct a
-          | a > 100 = StateT $ \_ -> Empty
+          | a > 100 = StateT $ P.const Empty
           | otherwise =
               StateT $ \s -> if S.member a s
                            then pure (False, s)
                            else pure (True, S.insert a s)
 
 -- | An `OptionalT` is a functor of an `Optional` value.
-data OptionalT k a =
+newtype OptionalT k a =
   OptionalT {
     runOptionalT ::
       k (Optional a)
@@ -274,7 +274,7 @@ instance Monad k => Monad (OptionalT k) where
   (=<<) f ma = OptionalT
              $ runOptionalT ma
            >>= onFull
-               (\a -> runOptionalT $ f a)
+               (runOptionalT . f)
 
 -- | A `Logger` is a pair of a list of log values (`[l]`) and an arbitrary value (`a`).
 data Logger l a =
@@ -332,7 +332,7 @@ log1 ::
   l
   -> a
   -> Logger l a
-log1 l a = Logger (pure l) a
+log1 l = Logger (pure l)
 
 -- | Remove all duplicate integers from a list. Produce a log as you go.
 -- If there is an element above 100, then abort the entire computation and produce no result.
